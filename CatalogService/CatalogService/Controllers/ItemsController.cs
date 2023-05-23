@@ -15,28 +15,46 @@ namespace CatalogService.Controllers
 
         // GET: api/<ItemsController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<ItemDto> GetAllItems()
         {
-            return new string[] { "value1", "value2" };
+            return items;
         }
 
         // GET api/<ItemsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public ItemDto? GetItemById(Guid id)
         {
-            return "value";
+            var item = items.FirstOrDefault(x => x.Id == id);
+            
+            return item;
         }
 
         // POST api/<ItemsController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ActionResult<ItemDto> CreateItem(CreateItemDto createItemDto)
         {
+            var item = new ItemDto(Guid.NewGuid(), createItemDto.Name, createItemDto.Description, createItemDto.Price, DateTimeOffset.UtcNow);
+            items.Add(item);
+
+            return CreatedAtAction(nameof(GetItemById), new { id = item.Id }, item);
         }
 
         // PUT api/<ItemsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult UpdateItem(Guid id, UpdateItemDto updateItemDto)
         {
+            var existingItem = items.Where(item => item.Id == id).FirstOrDefault();
+            var updatedItem = existingItem with
+            {
+                Name = updateItemDto.Name,
+                Description = updateItemDto.Description,
+                Price = updateItemDto.Price,
+            };
+
+            var itemIndex = items.FindIndex(existingItem => existingItem.Id == id);
+            items[itemIndex] = updatedItem;
+
+            return NoContent();
         }
 
         // DELETE api/<ItemsController>/5
