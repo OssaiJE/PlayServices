@@ -59,8 +59,12 @@ namespace CatalogService.Controllers
 
         // DELETE api/<ItemsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult DeleteItem(Guid id)
         {
+            var itemIndex = items.FindIndex(existingItem => existingItem.Id == id);
+            items.RemoveAt(itemIndex);
+
+            return NoContent();
         }
     }
 }
