@@ -22,10 +22,14 @@ namespace CatalogService.Controllers
 
         // GET api/<ItemsController>/5
         [HttpGet("{id}")]
-        public ItemDto? GetItemById(Guid id)
+        public ActionResult<ItemDto> GetItemById(Guid id)
         {
             var item = items.FirstOrDefault(x => x.Id == id);
-            
+            if (item == null)
+            {
+                return NotFound();
+            }
+
             return item;
         }
 
@@ -44,6 +48,11 @@ namespace CatalogService.Controllers
         public IActionResult UpdateItem(Guid id, UpdateItemDto updateItemDto)
         {
             var existingItem = items.Where(item => item.Id == id).FirstOrDefault();
+            if (existingItem == null)
+            {
+                return NotFound();
+            }
+
             var updatedItem = existingItem with
             {
                 Name = updateItemDto.Name,
@@ -62,6 +71,10 @@ namespace CatalogService.Controllers
         public IActionResult DeleteItem(Guid id)
         {
             var itemIndex = items.FindIndex(existingItem => existingItem.Id == id);
+            if (itemIndex < 0)
+            {
+                return NotFound();
+            }
             items.RemoveAt(itemIndex);
 
             return NoContent();
