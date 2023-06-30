@@ -16,9 +16,15 @@ namespace CatalogService.Repositories
             dbCollection = database.GetCollection<ItemEntity>(collectionName);
         }
 
-        public async Task<IReadOnlyCollection<ItemEntity>> GetAllAsync()
+        public async Task<IReadOnlyCollection<ItemEntity>> GetAllItems()
         {
             return await dbCollection.Find(filterBuilder.Empty).ToListAsync();
+        }
+
+        public async Task<ItemEntity> GetOneItem(Guid id)
+        {
+            FilterDefinition<ItemEntity> filter = filterBuilder.Eq(entity => entity.Id, id);
+            return await dbCollection.Find(filter).SingleOrDefaultAsync();
         }
     }
 }
